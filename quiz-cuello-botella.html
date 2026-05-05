@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Dónde se está ahogando tu negocio? — GastroConMario</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080b0f;
+  --bg2:      #0f1318;
+  --bg3:      #161c23;
+  --accent:   #ff4d1c;
+  --accent2:  #ff7a4d;
+  --white:    #f2ede8;
+  --white2:   #b8b0a6;
+  --muted:    #4a5260;
+  --border:   rgba(255,77,28,0.15);
+  --border2:  rgba(255,77,28,0.35);
+  --green:    #1db87a;
+  --yellow:   #f5b731;
+  --blue:     #3d8ef0;
+  --purple:   #8b5cf6;
+  --red:      #ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* GRAIN */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:999;opacity:.5;
+}
+
+/* ========= LOCK ========= */
+#lock{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:2rem;position:relative;
+}
+.lock-bg{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.lock-bg .blob1{
+  position:absolute;top:-20%;left:-10%;
+  width:60vw;height:60vw;max-width:600px;max-height:600px;
+  background:radial-gradient(circle,rgba(255,77,28,.07) 0%,transparent 70%);
+  border-radius:50%;
+}
+.lock-bg .blob2{
+  position:absolute;bottom:-20%;right:-10%;
+  width:50vw;height:50vw;max-width:500px;max-height:500px;
+  background:radial-gradient(circle,rgba(255,77,28,.04) 0%,transparent 70%);
+  border-radius:50%;
+}
+
+.lock-tag{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.2em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:1.5rem;
+  opacity:0;animation:up .5s .1s forwards;
+}
+.lock-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.8rem,9vw,6rem);
+  line-height:.95;text-align:center;
+  margin-bottom:1.25rem;
+  opacity:0;animation:up .5s .2s forwards;
+}
+.lock-title .fire{color:var(--accent);}
+.lock-desc{
+  font-size:15px;color:var(--white2);text-align:center;
+  max-width:420px;line-height:1.7;margin-bottom:3rem;
+  opacity:0;animation:up .5s .3s forwards;
+}
+.lock-card{
+  background:var(--bg2);
+  border:0.5px solid var(--border2);
+  border-radius:20px;
+  padding:2.5rem;width:100%;max-width:420px;
+  opacity:0;animation:up .5s .4s forwards;
+}
+.lock-card label{
+  font-family:'DM Mono',monospace;font-size:11px;
+  letter-spacing:.15em;color:var(--muted);
+  text-transform:uppercase;display:block;margin-bottom:.75rem;
+}
+.input-row{display:flex;gap:10px;margin-bottom:.75rem;}
+.code-in{
+  flex:1;background:var(--bg3);
+  border:0.5px solid var(--border2);border-radius:12px;
+  padding:14px 18px;
+  font-family:'DM Mono',monospace;font-size:17px;
+  letter-spacing:.18em;color:var(--white);outline:none;
+  text-transform:uppercase;transition:border-color .2s;
+}
+.code-in::placeholder{color:var(--muted);letter-spacing:.1em;}
+.code-in:focus{border-color:var(--accent);}
+.code-in.err{border-color:var(--red);animation:shake .3s;}
+.btn-enter{
+  background:var(--accent);color:#fff;
+  border:none;border-radius:12px;
+  padding:14px 22px;font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:background .2s,transform .1s;white-space:nowrap;
+}
+.btn-enter:hover{background:var(--accent2);}
+.btn-enter:active{transform:scale(.97);}
+.err-msg{font-size:12px;color:var(--red);min-height:16px;font-family:'DM Mono',monospace;}
+.lock-footer{
+  margin-top:2rem;padding-top:2rem;
+  border-top:.5px solid var(--border);text-align:center;
+}
+.lock-footer p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1rem;}
+.lock-footer strong{color:var(--white2);}
+.btn-out{
+  border:.5px solid var(--border2);border-radius:12px;
+  padding:11px 22px;font-size:13px;color:var(--accent);
+  background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:background .2s,border-color .2s;
+}
+.btn-out:hover{background:rgba(255,77,28,.08);border-color:var(--accent);}
+.lock-pills{
+  display:flex;gap:2.5rem;justify-content:center;
+  margin-top:3rem;
+  opacity:0;animation:up .5s .55s forwards;
+}
+.pill-n{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--accent);line-height:1;}
+.pill-l{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.06em;margin-top:3px;}
+
+/* ========= QUIZ ========= */
+#quiz{display:none;min-height:100vh;}
+
+.quiz-header{
+  background:var(--bg2);border-bottom:.5px solid var(--border);
+  padding:1rem 2rem;display:flex;align-items:center;
+  justify-content:space-between;gap:1rem;
+  position:sticky;top:0;z-index:10;
+}
+.quiz-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
+  color:var(--accent);letter-spacing:.05em;
+}
+.quiz-logo span{color:var(--white2);font-size:1rem;}
+.progress-wrap{flex:1;max-width:200px;height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.progress-bar{height:100%;background:var(--accent);border-radius:4px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+.q-counter{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;}
+
+.quiz-body{padding:3rem 2rem;max-width:680px;margin:0 auto;}
+
+.q-screen{display:none;}
+.q-screen.active{display:block;animation:up .4s forwards;}
+
+.q-number{
+  font-family:'DM Mono',monospace;font-size:11px;
+  letter-spacing:.18em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:1rem;
+}
+.q-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  line-height:1.05;margin-bottom:.75rem;color:var(--white);
+}
+.q-sub{font-size:14px;color:var(--white2);line-height:1.6;margin-bottom:2.5rem;}
+
+.options{display:flex;flex-direction:column;gap:12px;}
+.opt{
+  background:var(--bg2);border:.5px solid var(--border);
+  border-radius:14px;padding:1.1rem 1.4rem;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:14px;
+}
+.opt:hover{border-color:var(--accent);background:rgba(255,77,28,.05);}
+.opt.selected{border-color:var(--accent);background:rgba(255,77,28,.1);}
+.opt-dot{
+  width:20px;height:20px;border-radius:50%;
+  border:.5px solid var(--muted);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-size:10px;
+}
+.opt.selected .opt-dot{background:var(--accent);border-color:var(--accent);color:#fff;}
+.opt-text{font-size:14px;line-height:1.5;color:var(--white2);}
+.opt.selected .opt-text{color:var(--white);}
+.opt-emoji{font-size:18px;flex-shrink:0;}
+
+.btn-next{
+  margin-top:2rem;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:14px;
+  padding:16px 40px;font-size:15px;font-weight:600;
+  font-family:'Outfit',sans-serif;cursor:pointer;
+  transition:background .2s,transform .1s,opacity .2s;
+  opacity:.4;pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-next.ready{opacity:1;pointer-events:all;}
+.btn-next:hover.ready{background:var(--accent2);}
+.btn-next:active{transform:scale(.98);}
+
+/* ========= RESULT ========= */
+#result{display:none;min-height:100vh;}
+
+.result-header{
+  background:var(--bg2);border-bottom:.5px solid var(--border);
+  padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;
+}
+.result-body{padding:3rem 2rem;max-width:680px;margin:0 auto;}
+
+.result-tag{
+  font-family:'DM Mono',monospace;font-size:11px;
+  letter-spacing:.18em;text-transform:uppercase;
+  margin-bottom:1.25rem;
+}
+.result-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.4rem,7vw,4.5rem);
+  line-height:.95;margin-bottom:1.5rem;
+}
+.result-title .hl{color:var(--accent);}
+
+.result-card{
+  background:var(--bg2);border:.5px solid var(--border2);
+  border-radius:20px;padding:2rem;margin-bottom:1.5rem;
+}
+.result-card .rc-label{
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.15em;color:var(--muted);
+  text-transform:uppercase;margin-bottom:.75rem;
+}
+.result-card .rc-text{font-size:15px;color:var(--white2);line-height:1.75;}
+.result-card .rc-text strong{color:var(--white);}
+
+.symptoms{display:flex;flex-direction:column;gap:8px;margin-top:1rem;}
+.sym{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:14px;color:var(--white2);line-height:1.5;
+}
+.sym::before{content:'→';color:var(--accent);flex-shrink:0;font-weight:600;}
+
+.taller-card{
+  background:linear-gradient(135deg,rgba(255,77,28,.12),rgba(255,77,28,.04));
+  border:.5px solid var(--border2);
+  border-radius:20px;padding:2rem;margin-bottom:1.5rem;
+  position:relative;overflow:hidden;
+}
+.taller-card::before{
+  content:'';position:absolute;top:-50%;right:-20%;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(255,77,28,.08) 0%,transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.taller-eyebrow{
+  font-family:'DM Mono',monospace;font-size:10px;
+  letter-spacing:.18em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:.75rem;
+}
+.taller-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.9rem;line-height:1;margin-bottom:.75rem;
+}
+.taller-desc{font-size:14px;color:var(--white2);line-height:1.7;margin-bottom:1.5rem;}
+.btn-taller{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  border:none;border-radius:12px;
+  padding:15px 30px;font-size:15px;font-weight:600;
+  font-family:'Outfit',sans-serif;cursor:pointer;
+  transition:background .2s,transform .1s;text-decoration:none;
+}
+.btn-taller:hover{background:var(--accent2);}
+.btn-taller:active{transform:scale(.98);}
+
+.score-bar-wrap{margin:1rem 0;}
+.score-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:6px;}
+.score-track{height:6px;background:var(--bg3);border-radius:6px;overflow:hidden;}
+.score-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+
+.share-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1rem;}
+.btn-share{
+  border:.5px solid var(--border2);border-radius:10px;
+  padding:10px 20px;font-size:13px;color:var(--white2);
+  background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:all .2s;
+}
+.btn-share:hover{border-color:var(--accent);color:var(--accent);}
+
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+@media(max-width:520px){
+  .quiz-body,.result-body{padding:2rem 1.25rem;}
+  .quiz-header,.result-header{padding:.9rem 1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOCK ===== -->
+<div id="lock">
+  <div class="lock-bg"><div class="blob1"></div><div class="blob2"></div></div>
+  <div class="lock-tag">GastroConMario — Herramienta exclusiva</div>
+  <h1 class="lock-title">¿Dónde se está<br><span class="fire">ahogando</span><br>tu negocio?</h1>
+  <p class="lock-desc">Un diagnóstico de 6 preguntas que identifica exactamente dónde está el cuello de botella que te está costando plata hoy.</p>
+  <div class="lock-card">
+    <label>Ingresa tu código de acceso</label>
+    <div class="input-row">
+      <input type="text" class="code-in" id="codeIn" placeholder="GASTRO" maxlength="12" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')unlock()">
+      <button class="btn-enter" onclick="unlock()">Entrar</button>
+    </div>
+    <div class="err-msg" id="errMsg"></div>
+    <div class="lock-footer">
+      <p>¿No tenés código? Solo los miembros<br>de <strong>la comunidad de Mario</strong> tienen acceso.</p>
+      <button class="btn-out" onclick="window.open('https://wa.me/573000000000?text=Quiero%20el%20c%C3%B3digo%20del%20quiz','_blank')">Quiero entrar a la comunidad →</button>
+    </div>
+  </div>
+  <div class="lock-pills">
+    <div><div class="pill-n">6</div><div class="pill-l">Preguntas</div></div>
+    <div><div class="pill-n">3'</div><div class="pill-l">Minutos</div></div>
+    <div><div class="pill-n">6</div><div class="pill-l">Resultados</div></div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz">
+  <div class="quiz-header">
+    <div class="quiz-logo">Gastro<span>ConMario</span></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progBar" style="width:0%"></div></div>
+    <div class="q-counter" id="qCounter">1 / 6</div>
+  </div>
+  <div class="quiz-body" id="quizBody"></div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="result">
+  <div class="result-header">
+    <div class="quiz-logo">Gastro<span>ConMario</span></div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;">Tu diagnóstico</div>
+  </div>
+  <div class="result-body" id="resultBody"></div>
+</div>
+
+<script>
+// ---- CODES ----
+const CODES = ['GASTRO24','MARIO2025','COMUNIDAD','QUIZ2025'];
+
+function unlock(){
+  const v = document.getElementById('codeIn').value.trim().toUpperCase();
+  const inp = document.getElementById('codeIn');
+  if(CODES.includes(v)){
+    document.getElementById('lock').style.display='none';
+    document.getElementById('quiz').style.display='block';
+    buildQuiz();
+  } else {
+    inp.classList.add('err');
+    document.getElementById('errMsg').textContent='Código incorrecto. Pedilo en la comunidad de Mario.';
+    setTimeout(()=>{inp.classList.remove('err');document.getElementById('errMsg').textContent='';},2500);
+  }
+}
+
+// ---- QUESTIONS ----
+const QUESTIONS = [
+  {
+    id:'q1',
+    text:'Cuando termina el mes,\n¿sabés exactamente cuánto ganaste?',
+    sub:'No cuánto facturaste — cuánto te quedó limpio después de todos los gastos.',
+    options:[
+      {emoji:'✅',text:'Sí, tengo los números claros al día.',score:{fin:0}},
+      {emoji:'🤔',text:'Más o menos, pero hay cosas que no registro bien.',score:{fin:1}},
+      {emoji:'😬',text:'La verdad no, lo calculo a ojo.',score:{fin:2}},
+      {emoji:'🙈',text:'Prefiero no saber, la verdad me da miedo.',score:{fin:3}},
+    ]
+  },
+  {
+    id:'q2',
+    text:'¿Cuánto tiempo pasás haciendo\ncosas que podrías delegar?',
+    sub:'Piensa en tareas operativas: compras, redes, caja, limpieza, etc.',
+    options:[
+      {emoji:'💪',text:'Casi nada, mi equipo maneja la mayoría.',score:{ops:0}},
+      {emoji:'⚡',text:'Algo, pero ya estoy delegando poco a poco.',score:{ops:1}},
+      {emoji:'😓',text:'Bastante. Si yo no lo hago, no queda bien.',score:{ops:2}},
+      {emoji:'🔥',text:'Todo. Soy el chef, el cajero y el community manager.',score:{ops:3}},
+    ]
+  },
+  {
+    id:'q3',
+    text:'Cuando un cliente nuevo llega,\n¿cuántos vuelven a comprar?',
+    sub:'Honestamente — ¿tus clientes regresan o cada semana son caras nuevas?',
+    options:[
+      {emoji:'🤩',text:'La mayoría vuelve. Tengo clientes de hace años.',score:{ret:0}},
+      {emoji:'😊',text:'Algunos vuelven, pero no tengo forma de medirlo.',score:{ret:1}},
+      {emoji:'😐',text:'Pocos. Me cuesta retener clientes.',score:{ret:2}},
+      {emoji:'😔',text:'Casi ninguno vuelve. Siempre necesito clientes nuevos.',score:{ret:3}},
+    ]
+  },
+  {
+    id:'q4',
+    text:'¿Cómo fijaste el precio\nde lo que vendés?',
+    sub:'El precio real que cobrás hoy — ¿de dónde salió ese número?',
+    options:[
+      {emoji:'📊',text:'Calculé costos, margen y lo que el mercado soporta.',score:{precio:0}},
+      {emoji:'👀',text:'Miré lo que cobra la competencia y puse algo parecido.',score:{precio:2}},
+      {emoji:'🤷',text:'Puse lo que me pareció razonable en su momento.',score:{precio:2}},
+      {emoji:'😰',text:'Lo que los clientes me piden que cobre para no perderlos.',score:{precio:3}},
+    ]
+  },
+  {
+    id:'q5',
+    text:'¿Qué pasa en tu negocio\ncuando vos no estás?',
+    sub:'Un día libre, una cita médica, un viaje corto.',
+    options:[
+      {emoji:'🏖️',text:'Funciona igual. Tengo procesos y equipo.',score:{ops:0}},
+      {emoji:'📱',text:'Funciona pero me llaman para todo.',score:{ops:1}},
+      {emoji:'😅',text:'Funciona a medias. Hay cosas que solo yo sé hacer.',score:{ops:2}},
+      {emoji:'🚨',text:'Se para. Sin mí no hay negocio.',score:{ops:3}},
+    ]
+  },
+  {
+    id:'q6',
+    text:'¿Cómo conseguís\nclientes nuevos hoy?',
+    sub:'El canal principal por el que te llegan personas nuevas.',
+    options:[
+      {emoji:'📣',text:'Tengo un sistema: redes, pauta, referidos activos.',score:{mkt:0}},
+      {emoji:'📲',text:'Redes sociales, aunque no es muy consistente.',score:{mkt:1}},
+      {emoji:'🗣️',text:'Boca a boca. La gente me recomienda.',score:{mkt:1}},
+      {emoji:'🙏',text:'Espero que entren. No tengo estrategia definida.',score:{mkt:3}},
+    ]
+  },
+];
+
+// ---- RESULTS ----
+const RESULTS = {
+  fin:{
+    tag:'Cuello de botella #1',
+    title:'Tus números\nno te hablan',
+    color:'#3d8ef0',
+    desc:'Estás tomando decisiones importantes — precios, contrataciones, inversiones — sin tener claridad de lo que realmente entra y sale. El problema no es que ganes poco. El problema es que no sabés si estás ganando o perdiendo, y eso es más peligroso.',
+    symptoms:[
+      'Terminas el mes y no sabés si fue bueno o malo hasta que revisás el banco',
+      'Mezclás plata personal con la del negocio',
+      'Cobrás precios que "se sienten bien" pero no los calculaste',
+      'Le tenés miedo a mirar los números',
+    ],
+    fix:'En el taller vas a aprender a leer tus números en menos de 15 minutos al día, sin ser contador ni tener Excel complicado.',
+  },
+  ops:{
+    tag:'Cuello de botella #2',
+    title:'El negocio\ndepende de vos',
+    color:'#f5b731',
+    desc:'Sos el cuello de botella de tu propio negocio. No es falta de ganas ni de capacidad — es que nadie te enseñó a construir sistemas. Mientras vos seas imprescindible para todo, el negocio no puede crecer más allá de lo que tus horas permiten.',
+    symptoms:[
+      'Si no estás, algo sale mal o nadie toma decisiones',
+      'Trabajás más horas que cualquier empleado',
+      'No podés tomarte un fin de semana sin el teléfono prendido',
+      'Entrenás a alguien y al tiempo hacés todo de nuevo vos',
+    ],
+    fix:'En el taller vas a mapear exactamente qué tenés que soltar primero y cómo hacerlo sin que el negocio se caiga.',
+  },
+  ret:{
+    tag:'Cuello de botella #3',
+    title:'Tus clientes\nno vuelven',
+    color:'#1db87a',
+    desc:'Estás en una cinta sin fin: conseguir clientes nuevos, perderlos, conseguir más. El costo de adquisición se come el margen. Lo más valioso que tenés es un cliente que ya confía en vos — y lo estás dejando ir sin estrategia.',
+    symptoms:[
+      'Cada semana necesitás publicidad para que entren caras nuevas',
+      'No tenés sistema para que el cliente vuelva',
+      'No sabés cuánto vale un cliente en el tiempo',
+      'Competís por precio porque el cliente no tiene razón para volver',
+    ],
+    fix:'En el taller vas a construir una estrategia simple de retención que no depende de descuentos ni de publicidad constante.',
+  },
+  precio:{
+    tag:'Cuello de botella #4',
+    title:'Estás cobrando\nde más o de menos',
+    color:'#8b5cf6',
+    desc:'El precio no es un número que se siente bien — es una ecuación. Si lo pusiste mirando a la competencia o a lo que "los clientes aceptan", probablemente estés dejando plata en la mesa o vendiendo a pérdida sin saberlo.',
+    symptoms:[
+      'Dudás si subir precios porque tenés miedo de perder clientes',
+      'La competencia siempre "cobra menos" según tus clientes',
+      'Hacés descuentos para cerrar ventas con frecuencia',
+      'No sabés exactamente cuánto te cuesta producir cada cosa',
+    ],
+    fix:'En el taller vas a calcular tu precio real y vas a aprender a vender valor para que el precio deje de ser el problema.',
+  },
+  mkt:{
+    tag:'Cuello de botella #5',
+    title:'No tenés sistema\npara conseguir clientes',
+    color:'#ff4d1c',
+    desc:'Dependés del azar o del boca a boca. Eso funciona hasta que deja de funcionar. Sin un sistema predecible de atracción de clientes, el negocio vive en modo "esperar que entren" y eso no escala.',
+    symptoms:[
+      'No sabés de dónde vienen tus mejores clientes',
+      'Publicás en redes cuando te acordás o cuando las ventas bajan',
+      'No tenés forma de medir si la publicidad está funcionando',
+      'El mes bueno y el mes malo dependen de factores que no controlás',
+    ],
+    fix:'En el taller vas a diseñar un sistema básico de atracción de clientes que podés activar sin agencia ni presupuesto alto.',
+  },
+};
+
+// ---- QUIZ LOGIC ----
+let answers = [];
+let current = 0;
+
+function buildQuiz(){
+  const body = document.getElementById('quizBody');
+  body.innerHTML = '';
+  QUESTIONS.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className = 'q-screen' + (i===0?' active':'');
+    div.id = 'q-'+i;
+    div.innerHTML = `
+      <div class="q-number">Pregunta ${i+1} de ${QUESTIONS.length}</div>
+      <div class="q-text">${q.text.replace('\n','<br>')}</div>
+      <div class="q-sub">${q.sub}</div>
+      <div class="options" id="opts-${i}">
+        ${q.options.map((o,j)=>`
+          <div class="opt" onclick="selectOpt(${i},${j})" id="opt-${i}-${j}">
+            <span class="opt-emoji">${o.emoji}</span>
+            <div class="opt-text">${o.text}</div>
+            <div class="opt-dot" id="dot-${i}-${j}">✓</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn-next" id="btn-${i}" onclick="nextQ(${i})">
+        ${i < QUESTIONS.length-1 ? 'Siguiente →' : 'Ver mi diagnóstico →'}
+      </button>
+    `;
+    body.appendChild(div);
+  });
+  updateProgress(0);
+}
+
+function selectOpt(qi,oi){
+  // deselect all
+  QUESTIONS[qi].options.forEach((_,j)=>{
+    document.getElementById('opt-'+qi+'-'+j).classList.remove('selected');
+  });
+  document.getElementById('opt-'+qi+'-'+oi).classList.add('selected');
+  answers[qi] = oi;
+  document.getElementById('btn-'+qi).classList.add('ready');
+}
+
+function nextQ(qi){
+  if(answers[qi] === undefined) return;
+  if(qi < QUESTIONS.length-1){
+    document.getElementById('q-'+qi).classList.remove('active');
+    document.getElementById('q-'+(qi+1)).classList.add('active');
+    current = qi+1;
+    updateProgress(qi+1);
+  } else {
+    showResult();
+  }
+}
+
+function updateProgress(qi){
+  const pct = Math.round(((qi)/(QUESTIONS.length))*100);
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('qCounter').textContent = (qi+1)+' / '+QUESTIONS.length;
+}
+
+// ---- SCORING ----
+function calcResult(){
+  const scores = {fin:0,ops:0,ret:0,precio:0,mkt:0};
+  QUESTIONS.forEach((q,i)=>{
+    const ans = answers[i];
+    if(ans===undefined) return;
+    const s = q.options[ans].score;
+    Object.keys(s).forEach(k=>{ scores[k] = (scores[k]||0) + s[k]; });
+  });
+  // find max
+  let maxK = 'ops', maxV = -1;
+  Object.entries(scores).forEach(([k,v])=>{ if(v>maxV){maxV=v;maxK=k;} });
+  return {scores, winner:maxK};
+}
+
+function showResult(){
+  const {scores, winner} = calcResult();
+  document.getElementById('quiz').style.display='none';
+  document.getElementById('result').style.display='block';
+  sendToSheets(winner);
+
+  const R = RESULTS[winner];
+  const body = document.getElementById('resultBody');
+
+  // score bars
+  const scoreLabels = {fin:'Finanzas',ops:'Operaciones',ret:'Retención',precio:'Precio',mkt:'Marketing'};
+  const maxPossible = 9;
+  const barsHtml = Object.entries(scores).map(([k,v])=>`
+    <div class="score-bar-wrap">
+      <div class="score-label"><span>${scoreLabels[k]}</span><span>${v}/${maxPossible}</span></div>
+      <div class="score-track"><div class="score-fill" style="width:0%;background:${k===winner?R.color:'var(--muted)'}" id="sf-${k}"></div></div>
+    </div>
+  `).join('');
+
+  const sympHtml = R.symptoms.map(s=>`<div class="sym">${s}</div>`).join('');
+
+  body.innerHTML = `
+    <div class="result-tag" style="color:${R.color}">${R.tag} — GastroConMario</div>
+    <div class="result-title">${R.title.replace('\n','<br>')} <span class="hl">.</span></div>
+
+    <div class="result-card">
+      <div class="rc-label">Qué está pasando</div>
+      <div class="rc-text">${R.desc}</div>
+    </div>
+
+    <div class="result-card">
+      <div class="rc-label">Síntomas que probablemente reconocés</div>
+      <div class="symptoms">${sympHtml}</div>
+    </div>
+
+    <div class="result-card">
+      <div class="rc-label">Tu mapa de puntos críticos</div>
+      ${barsHtml}
+    </div>
+
+    <div class="taller-card">
+      <div class="taller-eyebrow">🔥 Lo que sigue</div>
+      <div class="taller-title">Taller GastroConMario</div>
+      <div class="taller-desc">
+        Identificaste que tu cuello de botella está en <strong>${scoreLabels[winner].toLowerCase()}</strong>. 
+        En el próximo taller vamos a trabajar exactamente eso — con casos reales, herramientas que podés aplicar ese mismo día y sin teoría que no sirve para tu tipo de negocio.<br><br>
+        <strong>${R.fix}</strong>
+      </div>
+      <a class="btn-taller" href="TU_LINK_AQUI" target="_blank">Quiero ir al taller →</a>
+    </div>
+
+    <div class="result-card">
+      <div class="rc-label">Compartí tu resultado</div>
+      <div style="font-size:14px;color:var(--white2);margin-bottom:1rem;line-height:1.6">
+        ¿Conocés a alguien con el mismo cuello de botella? Mandales el quiz.
+      </div>
+      <div class="share-row">
+        <button class="btn-share" onclick="shareWA()">Compartir por WhatsApp</button>
+        <button class="btn-share" onclick="copyLink()">Copiar link</button>
+      </div>
+    </div>
+  `;
+
+  // animate bars
+  setTimeout(()=>{
+    Object.entries(scores).forEach(([k,v])=>{
+      const el = document.getElementById('sf-'+k);
+      if(el) el.style.width = Math.round((v/maxPossible)*100)+'%';
+    });
+  }, 300);
+}
+
+// ---- GOOGLE SHEETS ----
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxiOMBId_BBKhtgoUevX3f6SeuPQjkUYWFzUWmHEMoBLD9y0iAy6ctUhLci6SYKqPR1vg/exec';
+
+const Q_LABELS = [
+  'P1 Números',
+  'P2 Delegación',
+  'P3 Retención',
+  'P4 Precio',
+  'P5 Sin mí',
+  'P6 Clientes'
+];
+
+function sendToSheets(winner){
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const hora  = now.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+
+  const payload = {
+    fecha,
+    hora,
+    p1: QUESTIONS[0].options[answers[0]]?.text || '—',
+    p2: QUESTIONS[1].options[answers[1]]?.text || '—',
+    p3: QUESTIONS[2].options[answers[2]]?.text || '—',
+    p4: QUESTIONS[3].options[answers[3]]?.text || '—',
+    p5: QUESTIONS[4].options[answers[4]]?.text || '—',
+    p6: QUESTIONS[5].options[answers[5]]?.text || '—',
+    resultado: RESULTS[winner].tag + ' — ' + RESULTS[winner].title.replace('\n',' ')
+  };
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(()=>{}); // silencioso — no interrumpe la experiencia del usuario
+}
+
+function shareWA(){
+  const url = encodeURIComponent(window.location.href);
+  const txt = encodeURIComponent('Hice el quiz de GastroConMario y descubrí dónde está el cuello de botella de mi negocio 🔥 Hacelo vos también:');
+  window.open('https://wa.me/?text='+txt+'%20'+url,'_blank');
+}
+function copyLink(){
+  navigator.clipboard.writeText(window.location.href).then(()=>{
+    const b = event.target;
+    b.textContent = '¡Copiado!';
+    setTimeout(()=>b.textContent='Copiar link',2000);
+  });
+}
+</script>
+</body>
+</html>
